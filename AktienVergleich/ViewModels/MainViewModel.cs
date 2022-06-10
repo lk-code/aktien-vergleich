@@ -29,6 +29,13 @@ namespace AktienVergleich.ViewModels
             set { SetProperty(ref _aktienCollection, value); }
         }
 
+        private ObservableCollection<int> _intervalCollection = null;
+        public ObservableCollection<int> IntervalCollection
+        {
+            get { return _intervalCollection; }
+            set { SetProperty(ref _intervalCollection, value); }
+        }
+
         private ICommand _addAktieCommand;
         public ICommand AddAktieCommand => _addAktieCommand ?? (_addAktieCommand = new RelayCommand(() =>
         {
@@ -44,6 +51,7 @@ namespace AktienVergleich.ViewModels
             this._synchronizationContext = SynchronizationContext.Current;
 
             this.AktienCollection = new ObservableCollection<Aktie>();
+            this.IntervalCollection = new ObservableCollection<int>();
         }
 
         public MainViewModel(ILoggingService loggingService) : base(loggingService)
@@ -51,6 +59,7 @@ namespace AktienVergleich.ViewModels
             this._synchronizationContext = SynchronizationContext.Current;
 
             this.AktienCollection = new ObservableCollection<Aktie>();
+            this.IntervalCollection = new ObservableCollection<int>();
         }
 
         ~MainViewModel()
@@ -67,6 +76,11 @@ namespace AktienVergleich.ViewModels
             await Task.CompletedTask;
             this._loggingService.LogMessageReceived -= LoggingService_LogMessageReceived;
             this._loggingService.LogMessageReceived += LoggingService_LogMessageReceived;
+
+            for (int i = 1; i <= 12; i++)
+            {
+                this.IntervalCollection.Add(i);
+            }
 
             this.HandleAddAktie();
         }

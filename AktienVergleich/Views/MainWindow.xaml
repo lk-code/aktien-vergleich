@@ -33,72 +33,97 @@
             </Button>
         </StackPanel>
 
-        <ItemsControl Grid.Row="1"
-                      ItemsSource="{Binding Path=AktienCollection, Mode=TwoWay}">
+        <ScrollViewer Grid.Row="1"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Disabled">
 
-            <d:ItemsControl.ItemsSource>
-                <x:Array Type="{x:Type models:Aktie}">
-                    <models:Aktie Name="Microsoft"
-                                  Interval="3" />
-                    <models:Aktie Name="Apple"
-                                  Interval="6" />
-                </x:Array>
-            </d:ItemsControl.ItemsSource>
+            <ItemsControl x:Name="ContentItemsControl"
+                          Margin="4"
+                          ItemsSource="{Binding Path=AktienCollection, Mode=TwoWay}">
 
-            <ItemsControl.ItemTemplate>
+                <d:ItemsControl.ItemsSource>
+                    <x:Array Type="{x:Type models:Aktie}">
+                        <models:Aktie Name="Microsoft"
+                                      Price="1.75"
+                                      DividendSum="0.05"
+                                      Error="Die Dividende muss höher als 0 sein."
+                                      Interval="3" />
+                        <models:Aktie Name="Apple"
+                                      Interval="6" />
+                    </x:Array>
+                </d:ItemsControl.ItemsSource>
 
-                <DataTemplate DataType="{x:Type models:Aktie}">
+                <ItemsControl.ItemTemplate>
 
-                    <StackPanel Width="150"
-                                Margin="0,0,8,0"
-                                Orientation="Vertical">
+                    <DataTemplate DataType="{x:Type models:Aktie}">
 
-                        <TextBox Text="{Binding Path=Name, Mode=TwoWay}"
-                                 Margin="0,0,0,4"
-                                 mahapps:TextBoxHelper.Watermark="Name" />
+                        <StackPanel Width="180"
+                                    Margin="0,0,8,0"
+                                    Orientation="Vertical">
 
-                        <ComboBox Text="{Binding Path.Interval, Mode=TwoWay}"
-                                  Margin="0,0,0,4"
-                                  mahapps:TextBoxHelper.Watermark="Intervall">
-                            <ComboBoxItem Content="1" />
-                            <ComboBoxItem Content="2" />
-                            <ComboBoxItem Content="3" />
-                            <ComboBoxItem Content="4" />
-                            <ComboBoxItem Content="5" />
-                            <ComboBoxItem Content="6" />
-                            <ComboBoxItem Content="7" />
-                            <ComboBoxItem Content="8" />
-                            <ComboBoxItem Content="9" />
-                            <ComboBoxItem Content="10" />
-                            <ComboBoxItem Content="11" />
-                            <ComboBoxItem Content="12" />
-                        </ComboBox>
+                            <TextBlock Text="Name:" />
+                            <TextBox Text="{Binding Path=Name, Mode=TwoWay}"
+                                     Margin="0,0,0,4"
+                                     mahapps:TextBoxHelper.Watermark="Name" />
 
-                        <mahapps:NumericUpDown Value="{Binding Path=Price, Mode=TwoWay}"
-                                               Margin="0,0,0,4"
-                                               StringFormat="C2"
-                                               mahapps:TextBoxHelper.Watermark="Preis"
-                                               Minimum="0" />
+                            <TextBlock Text="Ausschüttung:" />
+                            <ComboBox SelectedValue="{Binding Path=Interval, Mode=TwoWay}"
+                                      ItemsSource="{Binding ElementName=ContentItemsControl, Path=DataContext.IntervalCollection}"
+                                      Margin="0,0,0,4"
+                                      mahapps:TextBoxHelper.Watermark="Intervall" />
 
-                        <mahapps:NumericUpDown Value="{Binding Path=DividendSum, Mode=TwoWay}"
-                                               Margin="0,0,0,4"
-                                               StringFormat="C2"
-                                               mahapps:TextBoxHelper.Watermark="Preis"
-                                               Minimum="0" />
+                            <TextBlock Text="Aktien-Preis:" />
+                            <mahapps:NumericUpDown Value="{Binding Path=Price, Mode=TwoWay}"
+                                                   Margin="0,0,0,4"
+                                                   StringFormat="C2"
+                                                   mahapps:TextBoxHelper.Watermark="Preis"
+                                                   Minimum="0" />
 
-                    </StackPanel>
+                            <TextBlock Text="Dividende:" />
+                            <mahapps:NumericUpDown Value="{Binding Path=DividendSum, Mode=TwoWay}"
+                                                   Margin="0,0,0,4"
+                                                   StringFormat="C2"
+                                                   mahapps:TextBoxHelper.Watermark="Preis"
+                                                   Minimum="0" />
 
-                </DataTemplate>
+                            <Separator Margin="0,0,0,4" />
 
-            </ItemsControl.ItemTemplate>
+                            <TextBlock Text="Dividende pro Aktie/Monat:" />
+                            <mahapps:NumericUpDown Value="{Binding Path=DividendPerMonthSum, Mode=TwoWay}"
+                                                   Background="#ffccffcc"
+                                                   Margin="0,0,0,4"
+                                                   HideUpDownButtons="True"
+                                                   StringFormat="C2"
+                                                   mahapps:TextBoxHelper.Watermark="Preis"
+                                                   IsReadOnly="True" />
 
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
+                            <TextBlock Text="Dividende pro 100€ Aktien:" />
+                            <mahapps:NumericUpDown Value="{Binding Path=DividendPerSamePrice, Mode=TwoWay}"
+                                                   Background="#ffccffcc"
+                                                   Margin="0,0,0,4"
+                                                   HideUpDownButtons="True"
+                                                   StringFormat="C2"
+                                                   mahapps:TextBoxHelper.Watermark="Preis"
+                                                   IsReadOnly="True" />
 
-        </ItemsControl>
+                            <TextBlock Text="{Binding Error, Mode=OneWay}"
+                                       Margin="0,0,0,0" />
+
+                        </StackPanel>
+
+                    </DataTemplate>
+
+                </ItemsControl.ItemTemplate>
+
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+            </ItemsControl>
+
+        </ScrollViewer>
 
     </Grid>
 
