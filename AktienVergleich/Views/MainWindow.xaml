@@ -1,0 +1,105 @@
+﻿<mahapps:MetroWindow x:Class="AktienVergleich.Views.MainWindow"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                     xmlns:local="clr-namespace:AktienVergleich.Views"
+                     xmlns:mahapps="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                     xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                     xmlns:vm="clr-namespace:AktienVergleich.ViewModels"
+                     xmlns:models="clr-namespace:AktienVergleich.Models"
+                     d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
+                     mc:Ignorable="d"
+                     Title="Aktien-Vergleich"
+                     Height="450"
+                     Width="800">
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal"
+                    Margin="4"
+                    Grid.Row="0">
+            <Button Style="{DynamicResource MahApps.Styles.Button.Circle}"
+                    Command="{Binding AddAktieCommand,Mode=OneWay}"
+                    Margin="0,0,8,0"
+                    Padding="8">
+                <mah:FontIcon FontFamily="Segoe MDL2 Assets"
+                              Glyph="&#xECC8;" />
+            </Button>
+        </StackPanel>
+
+        <ItemsControl Grid.Row="1"
+                      ItemsSource="{Binding Path=AktienCollection, Mode=TwoWay}">
+
+            <d:ItemsControl.ItemsSource>
+                <x:Array Type="{x:Type models:Aktie}">
+                    <models:Aktie Name="Microsoft"
+                                  Interval="3" />
+                    <models:Aktie Name="Apple"
+                                  Interval="6" />
+                </x:Array>
+            </d:ItemsControl.ItemsSource>
+
+            <ItemsControl.ItemTemplate>
+
+                <DataTemplate DataType="{x:Type models:Aktie}">
+
+                    <StackPanel Width="150"
+                                Margin="0,0,8,0"
+                                Orientation="Vertical">
+
+                        <TextBox Text="{Binding Path=Name, Mode=TwoWay}"
+                                 Margin="0,0,0,4"
+                                 mahapps:TextBoxHelper.Watermark="Name" />
+
+                        <ComboBox Text="{Binding Path.Interval, Mode=TwoWay}"
+                                  Margin="0,0,0,4"
+                                  mahapps:TextBoxHelper.Watermark="Intervall">
+                            <ComboBoxItem Content="1" />
+                            <ComboBoxItem Content="2" />
+                            <ComboBoxItem Content="3" />
+                            <ComboBoxItem Content="4" />
+                            <ComboBoxItem Content="5" />
+                            <ComboBoxItem Content="6" />
+                            <ComboBoxItem Content="7" />
+                            <ComboBoxItem Content="8" />
+                            <ComboBoxItem Content="9" />
+                            <ComboBoxItem Content="10" />
+                            <ComboBoxItem Content="11" />
+                            <ComboBoxItem Content="12" />
+                        </ComboBox>
+
+                        <mahapps:NumericUpDown Value="{Binding Path=Price, Mode=TwoWay}"
+                                               Margin="0,0,0,4"
+                                               StringFormat="C2"
+                                               mahapps:TextBoxHelper.Watermark="Preis"
+                                               Minimum="0" />
+
+                        <mahapps:NumericUpDown Value="{Binding Path=DividendSum, Mode=TwoWay}"
+                                               Margin="0,0,0,4"
+                                               StringFormat="C2"
+                                               mahapps:TextBoxHelper.Watermark="Preis"
+                                               Minimum="0" />
+
+                    </StackPanel>
+
+                </DataTemplate>
+
+            </ItemsControl.ItemTemplate>
+
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+        </ItemsControl>
+
+    </Grid>
+
+</mahapps:MetroWindow>
