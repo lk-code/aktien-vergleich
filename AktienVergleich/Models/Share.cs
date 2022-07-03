@@ -182,8 +182,6 @@ namespace AktienVergleich.Models
 
             try
             {
-                int i = 0;
-
                 double part = (this.DividendSum / (double)this.Interval);
 
                 double result = Math.Round(part, 2);
