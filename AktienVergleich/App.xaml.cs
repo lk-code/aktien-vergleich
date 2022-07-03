@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AktienVergleich.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Globalization;
 using System.Threading;
 using System.Windows;
@@ -29,16 +31,20 @@ namespace AktienVergleich
         {
             base.OnStartup(e);
 
+            // 1. ui culture
             Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
             Thread.CurrentThread.CurrentUICulture = new CultureInfo("de-DE");
             FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement), new FrameworkPropertyMetadata(
                         XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)));
 
-            // 1. initialize Dipendency Injection
-            await AktienVergleich.Startup.Init();
+            // 2. initialize Dipendency Injection
+            IServiceCollection serviceCollection = new ServiceCollection()
+                .AddAppConfig()
+                .AddPlatform()
+                .AddViewModel()
+                ;
 
-            // 2. startup Logging
-            App.ServiceProvider = AktienVergleich.Startup.ServiceProvider!;
+            App.ServiceProvider = serviceCollection.BuildServiceProvider();
         }
 
         /// <summary>

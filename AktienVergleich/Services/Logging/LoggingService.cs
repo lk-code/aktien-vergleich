@@ -1,5 +1,4 @@
 ﻿using AktienVergleich.Interfaces;
-using LKCode.Helper.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -46,8 +45,6 @@ namespace AktienVergleich.Services.Logging
 
         public event EventHandler<string> LogMessageReceived;
 
-        private readonly IConfigService _configService;
-
         private readonly string _logFileName;
 
         private bool _isDebug = false;
@@ -61,10 +58,8 @@ namespace AktienVergleich.Services.Logging
 
         #region Konstruktoren
 
-        public LoggingService(IConfigService configService)
+        public LoggingService()
         {
-            this._configService = configService ?? throw new ArgumentNullException(nameof(configService));
-
             this._logFileName = string.Format(LOG_FILE_NAME, DateTime.Now.ToString("MM-dd-yyyy"));
 
             this.Initialize();

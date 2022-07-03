@@ -1,4 +1,5 @@
 ﻿using AktienVergleich.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System;
 
@@ -9,6 +10,7 @@ namespace AktienVergleich.ViewModels
         #region Properties
 
         protected readonly ILoggingService _loggingService;
+        protected readonly IConfiguration _configuration;
 
         #endregion
 
@@ -19,9 +21,11 @@ namespace AktienVergleich.ViewModels
 
         }
 
-        public ViewModelBase(ILoggingService loggingService) : this()
+        public ViewModelBase(ILoggingService loggingService,
+            IConfiguration configuration) : this()
         {
             this._loggingService = loggingService ?? throw new ArgumentNullException(nameof(loggingService));
+            this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
             this.LoadDesignerInstance();
         }

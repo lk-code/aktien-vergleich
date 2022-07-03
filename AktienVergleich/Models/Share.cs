@@ -1,20 +1,49 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using AktienVergleich.Interfaces;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Input;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace AktienVergleich.Models
 {
-    public class Aktie : ObservableObject
+    public class Share : ObservableObject
     {
+        #region Properties
+
+        private readonly IConfiguration _configuration;
+        private readonly IShareService _shareService;
+        private readonly ICurrencyConverterService _currencyConverterService;
+
+        private readonly bool _onlineShareSearchEnabled = false;
+
+        private ObservableCollection<Company> _companiesCollection = null;
+        public ObservableCollection<Company> CompaniesCollection
+        {
+            get { return _companiesCollection; }
+            set { SetProperty(ref _companiesCollection, value); }
+        }
+        private ICommand _companyLookupCommand;
+        public ICommand CompanyLookupCommand => _companyLookupCommand ?? (_companyLookupCommand = new RelayCommand<string>((eventArgs) =>
+        {
+            _ = this.LookUpForCompany(eventArgs);
+        }));
+
+        #endregion
+
         #region Eingabe-Properties
 
         /// <summary>
-        /// Der Name der Aktie
+        /// Das Unternehmen
         /// </summary>
-        private string _name = string.Empty;
-        public string Name
+        private Company _company = null;
+        public Company Company
         {
-            get { return _name; }
-            set { SetProperty(ref _name, value); }
+            get { return _company; }
+            set { SetProperty(ref _company, value); }
         }
         /// <summary>
         /// Content für einen Fehler, etc.
@@ -41,7 +70,7 @@ namespace AktienVergleich.Models
             {
                 SetProperty(ref _interval, value);
 
-                this.Calculate();
+                _ = this.CalculateAsync();
             }
         }
         /// <summary>
@@ -55,7 +84,7 @@ namespace AktienVergleich.Models
             {
                 SetProperty(ref _price, value);
 
-                this.Calculate();
+                _ = this.CalculateAsync();
             }
         }
         /// <summary>
@@ -69,7 +98,7 @@ namespace AktienVergleich.Models
             {
                 SetProperty(ref _dividendSum, value);
 
-                this.Calculate();
+                _ = this.CalculateAsync();
             }
         }
 
@@ -91,6 +120,7 @@ namespace AktienVergleich.Models
         /// Gibt die berechnete Dividende pro 100€ Aktien (zum Vergleich)
         /// </summary>
         private double _dividendPerSamePrice = 0.00;
+
         public double DividendPerSamePrice
         {
             get { return _dividendPerSamePrice; }
@@ -101,9 +131,20 @@ namespace AktienVergleich.Models
 
         #region constructors
 
-        public Aktie()
+        public Share()
         {
+            this.CompaniesCollection = new ObservableCollection<Company>();
+        }
 
+        public Share(IConfiguration configuration,
+            IShareService shareService,
+            ICurrencyConverterService currencyConverterService) : this()
+        {
+            this._configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this._shareService = shareService ?? throw new ArgumentNullException(nameof(shareService));
+            this._currencyConverterService = currencyConverterService ?? throw new ArgumentNullException(nameof(currencyConverterService));
+
+            this._onlineShareSearchEnabled = this._configuration.GetValue<bool>("Features:OnlineShareSearch", false);
         }
 
         #endregion
@@ -113,7 +154,7 @@ namespace AktienVergleich.Models
         /// <summary>
         /// 
         /// </summary>
-        private void Calculate()
+        private async Task CalculateAsync()
         {
             this.Error = string.Empty;
 
@@ -141,6 +182,8 @@ namespace AktienVergleich.Models
 
             try
             {
+                int i = 0;
+
                 double part = (this.DividendSum / (double)this.Interval);
 
                 double result = Math.Round(part, 2);
@@ -153,6 +196,28 @@ namespace AktienVergleich.Models
             catch (Exception exception)
             {
                 this.Error = exception.Message;
+            }
+        }
+
+        private async Task LookUpForCompany(string name)
+        {
+            if (this._onlineShareSearchEnabled != true)
+            {
+                return;
+            }
+
+            this.CompaniesCollection.Clear();
+
+            if (string.IsNullOrEmpty(name)
+                || name.Length < 3)
+            {
+                return;
+            }
+
+            List<Company> companies = await this._shareService.GetCompaniesAsync(name);
+            foreach (Company company in companies)
+            {
+                this.CompaniesCollection.Add(company);
             }
         }
 

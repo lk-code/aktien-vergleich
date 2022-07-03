@@ -8,6 +8,7 @@
                      xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                      xmlns:vm="clr-namespace:AktienVergleich.ViewModels"
                      xmlns:models="clr-namespace:AktienVergleich.Models"
+                     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                      d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
                      mc:Ignorable="d"
                      Title="Aktien-Vergleich"
@@ -39,32 +40,53 @@
 
             <ItemsControl x:Name="ContentItemsControl"
                           Margin="4"
-                          ItemsSource="{Binding Path=AktienCollection, Mode=TwoWay}">
+                          ItemsSource="{Binding Path=ShareCollection, Mode=TwoWay}">
 
                 <d:ItemsControl.ItemsSource>
                     <x:Array Type="{x:Type models:Aktie}">
-                        <models:Aktie Name="Microsoft"
+                        <models:Share Name="Microsoft"
                                       Price="1.75"
                                       DividendSum="0.05"
                                       Error="Die Dividende muss höher als 0 sein."
                                       Interval="3" />
-                        <models:Aktie Name="Apple"
+                        <models:Share Name="Apple"
                                       Interval="6" />
                     </x:Array>
                 </d:ItemsControl.ItemsSource>
 
                 <ItemsControl.ItemTemplate>
 
-                    <DataTemplate DataType="{x:Type models:Aktie}">
+                    <DataTemplate DataType="{x:Type models:Share}">
 
                         <StackPanel Width="180"
                                     Margin="0,0,8,0"
                                     Orientation="Vertical">
 
                             <TextBlock Text="Name:" />
-                            <TextBox Text="{Binding Path=Name, Mode=TwoWay}"
-                                     Margin="0,0,0,4"
-                                     mahapps:TextBoxHelper.Watermark="Name" />
+                            <ComboBox ItemsSource="{Binding Path=CompaniesCollection, Mode=OneWay}"
+                                      x:Name="CompaniesCollectionComboBox"
+                                      TextBoxBase.TextChanged="CompaniesCollectionComboBox_TextChanged"
+                                      SelectedItem="{Binding Path=Company, Mode=TwoWay}"
+                                      IsEditable="True"
+                                      IsTextSearchEnabled="True"
+                                      Margin="0,0,0,4">
+
+                                <!--<i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="TextBoxBase.TextChanged">
+                                        <i:InvokeCommandAction Command="{Binding Path=CompanyLookupCommand, Mode=OneWay}"
+                                                               CommandParameter="{Binding Text, ElementName=CompaniesCollectionComboBox}" />
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>-->
+
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type models:Company}">
+                                        <Grid>
+                                            <TextBlock Text="{Binding Path=Name, Mode=OneWay}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+
+                            </ComboBox>
 
                             <TextBlock Text="Ausschüttung:" />
                             <ComboBox SelectedValue="{Binding Path=Interval, Mode=TwoWay}"

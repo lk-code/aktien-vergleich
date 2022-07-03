@@ -1,6 +1,8 @@
-﻿using AktienVergleich.ViewModels;
+﻿using AktienVergleich.Models;
+using AktienVergleich.ViewModels;
 using MahApps.Metro.Controls;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace AktienVergleich.Views
 {
@@ -23,6 +25,12 @@ namespace AktienVergleich.Views
         private async void ImportWindow_Loaded(object sender, RoutedEventArgs e)
         {
             await this.ViewModel.InitializeAsync();
+        }
+
+        private void CompaniesCollectionComboBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            string content = (e.OriginalSource as TextBox)!.Text;
+            ((sender as ComboBox)!.DataContext as Share)!.CompanyLookupCommand.Execute(content);
         }
     }
 }

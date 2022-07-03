@@ -1,5 +1,6 @@
 ﻿using AktienVergleich.Interfaces;
 using AktienVergleich.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Toolkit.Mvvm.Input;
 using System;
 using System.Collections.ObjectModel;
@@ -14,6 +15,8 @@ namespace AktienVergleich.ViewModels
         #region properties
 
         private readonly SynchronizationContext _synchronizationContext = null;
+        private readonly IShareService _shareService;
+        private readonly ICurrencyConverterService _currencyConverterService;
 
         private string _loggingContent = string.Empty;
         public string LoggingContent
@@ -22,8 +25,8 @@ namespace AktienVergleich.ViewModels
             set { SetProperty(ref _loggingContent, value); }
         }
 
-        private ObservableCollection<Aktie> _aktienCollection = null;
-        public ObservableCollection<Aktie> AktienCollection
+        private ObservableCollection<Share> _aktienCollection = null;
+        public ObservableCollection<Share> ShareCollection
         {
             get { return _aktienCollection; }
             set { SetProperty(ref _aktienCollection, value); }
@@ -50,15 +53,21 @@ namespace AktienVergleich.ViewModels
         {
             this._synchronizationContext = SynchronizationContext.Current;
 
-            this.AktienCollection = new ObservableCollection<Aktie>();
+            this.ShareCollection = new ObservableCollection<Share>();
             this.IntervalCollection = new ObservableCollection<int>();
         }
 
-        public MainViewModel(ILoggingService loggingService) : base(loggingService)
+        public MainViewModel(ILoggingService loggingService,
+            IShareService shareService,
+            ICurrencyConverterService currencyConverterService,
+            IConfiguration configuration) : base(loggingService, configuration)
         {
+            this._shareService = shareService ?? throw new ArgumentNullException(nameof(shareService));
+            this._currencyConverterService = currencyConverterService ?? throw new ArgumentNullException(nameof(currencyConverterService));
+
             this._synchronizationContext = SynchronizationContext.Current;
 
-            this.AktienCollection = new ObservableCollection<Aktie>();
+            this.ShareCollection = new ObservableCollection<Share>();
             this.IntervalCollection = new ObservableCollection<int>();
         }
 
@@ -92,7 +101,11 @@ namespace AktienVergleich.ViewModels
 
         private void HandleAddAktie()
         {
-            this.AktienCollection.Add(new Aktie());
+            this.ShareCollection.Add(
+                new Share(
+                this._configuration,
+                this._shareService,
+                this._currencyConverterService));
         }
 
         #endregion
